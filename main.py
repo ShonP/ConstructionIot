@@ -7,10 +7,13 @@ import sys
 from motor_control import run, back, left, right, brake, cleanup
 from sensor_tracking import get_sensor_state, is_robot_on_track
 from video_manager import video_recording
+from camera_control import look_around  # Import the look_around function
 import yaml
 from dotenv import load_dotenv
+import asyncio  # Import asyncio to handle async functions
 
 load_dotenv()
+
 # Load configuration
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -19,7 +22,7 @@ logging_settings = config["logging"]
 
 # Configure logging
 logging.basicConfig(
-    level=getattr(logging, logging_settings["level"]),
+    level=getattr(logging, logging_settings["level"].upper(), logging.INFO),
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[logging.FileHandler(logging_settings["file"]), logging.StreamHandler()],
 )
@@ -71,16 +74,25 @@ def tracking_test():
 def robot_control():
     global is_on_track
     logging.info("Robot control thread started.")
-    last_pause_time = time.time()
+    last_action_time = time.time()
 
     while True:
         tracking_test()
         current_time = time.time()
-        if current_time - last_pause_time >= 2:
-            logging.info("Pausing for 2 seconds...")
-            brake()
-            time.sleep(2)  # Pause for 2 seconds
-            last_pause_time = time.time()
+        # Replace the existing pause logic with look_around
+        if current_time - last_action_time >= 2:
+            logging.info("Initiating look around sequence.")
+            try:
+                # Create a new event loop for this thread
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(look_around())
+                loop.close()
+                logging.info("Look around sequence completed.")
+            except Exception as e:
+                logging.error(f"Error during look around: {e}")
+            finally:
+                last_action_time = time.time()
 
         if is_on_track:
             if not recording_event.is_set():
