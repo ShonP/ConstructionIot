@@ -1,5 +1,5 @@
-RPi.GPIO
 opencv-python
 requests
 aiohttp
 pyyaml
+python-dotenv

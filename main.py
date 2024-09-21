@@ -8,33 +8,35 @@ from motor_control import run, back, left, right, brake, cleanup
 from sensor_tracking import get_sensor_state, is_robot_on_track
 from video_manager import video_recording
 import yaml
+from dotenv import load_dotenv
 
+load_dotenv()
 # Load configuration
-with open('config.yaml', 'r') as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
-logging_settings = config['logging']
+logging_settings = config["logging"]
 
 # Configure logging
 logging.basicConfig(
-    level=getattr(logging, logging_settings['level']),
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(logging_settings['file']),
-        logging.StreamHandler()
-    ]
+    level=getattr(logging, logging_settings["level"]),
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(logging_settings["file"]), logging.StreamHandler()],
 )
 
 # Retrieve the bearer token securely
-token = os.getenv('BEARER_TOKEN')
+token = os.getenv("BEARER_TOKEN")
 if not token:
-    logging.error("Bearer token not found. Please set the BEARER_TOKEN environment variable.")
+    logging.error(
+        "Bearer token not found. Please set the BEARER_TOKEN environment variable."
+    )
     sys.exit(1)
 
 # Initialize threading events
 recording_event = threading.Event()
 
 is_on_track = False
+
 
 def tracking_test():
     global is_on_track
@@ -44,12 +46,27 @@ def tracking_test():
     # Decision tree for motor control based on sensor state
     if state == (0, 0, 0, 0):
         run()
-    elif state in [(1, 0, 0, 0), (0, 1, 0, 0), (1, 1, 0, 0), (1, 0, 0, 1), (1, 1, 0, 1), (1, 1, 1, 0)]:
+    elif state in [
+        (1, 0, 0, 0),
+        (0, 1, 0, 0),
+        (1, 1, 0, 0),
+        (1, 0, 0, 1),
+        (1, 1, 0, 1),
+        (1, 1, 1, 0),
+    ]:
         right()
-    elif state in [(0, 0, 1, 0), (0, 0, 0, 1), (0, 0, 1, 1), (0, 1, 1, 0), (1, 0, 1, 0), (0, 1, 1, 1)]:
+    elif state in [
+        (0, 0, 1, 0),
+        (0, 0, 0, 1),
+        (0, 0, 1, 1),
+        (0, 1, 1, 0),
+        (1, 0, 1, 0),
+        (0, 1, 1, 1),
+    ]:
         left()
     elif state == (1, 1, 1, 1):
         brake()
+
 
 def robot_control():
     global is_on_track
@@ -79,11 +96,13 @@ def robot_control():
 
     logging.info("Robot control thread terminated.")
 
+
 def signal_handler(sig, frame):
     logging.info("Signal received. Shutting down...")
     recording_event.clear()
     cleanup()
     sys.exit(0)
+
 
 if __name__ == "__main__":
     # Register signal handlers for graceful shutdown
@@ -91,7 +110,9 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, signal_handler)
 
     # Start the video recording thread
-    recording_thread = threading.Thread(target=video_recording, args=(recording_event, token), daemon=True)
+    recording_thread = threading.Thread(
+        target=video_recording, args=(recording_event, token), daemon=True
+    )
     recording_thread.start()
 
     # Start the robot control thread
