@@ -13,17 +13,17 @@ logging.basicConfig(
 )
 
 # Configuration Constants
-SERVO_PINA = 9   # BCM GPIO pin for Servo A (Horizontal Movement)
-SERVO_PINB = 11  # BCM GPIO pin for Servo B (Vertical Movement)
+SERVO_PINA = 11   # BCM GPIO pin for Servo A (Horizontal Movement)
+SERVO_PINB = 9  # BCM GPIO pin for Servo B (Vertical Movement)
 
 # Servo Angles
-CENTER_ANGLE_A = 90    # Center position for Servo A
+CENTER_ANGLE_A = 80    # Center position for Servo A
 LEFT_ANGLE_A = 45      # Left position for Servo A
 RIGHT_ANGLE_A = 135    # Right position for Servo A
 
-CENTER_ANGLE_B = 90    # Center position for Servo B
-BOTTOM_ANGLE_B = 135   # Bottom position for Servo B
-TOP_ANGLE_B = 45       # Top position for Servo B
+CENTER_ANGLE_B = 75    # Center position for Servo B
+BOTTOM_ANGLE_B = 55   # Bottom position for Servo B
+TOP_ANGLE_B = 85       # Top position for Servo B
 
 # PWM Frequency
 PWM_FREQUENCY = 50  # 50Hz is standard for servos
@@ -84,11 +84,15 @@ async def look_around():
     set_servoa_angle(LEFT_ANGLE_A)
     set_servob_angle(BOTTOM_ANGLE_B)
     await asyncio.sleep(1)  # Wait for the movement to complete
+    set_servob_angle(TOP_ANGLE_B)
+    await asyncio.sleep(1)  # Wait for the movement to complete
 
     # Move to Right and Bottom
     logging.info("Moving to Right and Bottom.")
     set_servoa_angle(RIGHT_ANGLE_A)
     set_servob_angle(BOTTOM_ANGLE_B)
+    await asyncio.sleep(1)  # Wait for the movement to complete
+    set_servob_angle(TOP_ANGLE_B)
     await asyncio.sleep(1)  # Wait for the movement to complete
 
     # Return to Center
