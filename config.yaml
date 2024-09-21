@@ -14,7 +14,7 @@ sensor_pins:
 
 video_settings:
   resolution: [640, 480]
-  fps: 20.0
+  fps: 5.0
   codec: "mp4v"
   directory: "videos"
 

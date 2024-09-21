@@ -23,7 +23,7 @@ RIGHT_ANGLE_A = 135    # Right position for Servo A
 
 CENTER_ANGLE_B = 75    # Center position for Servo B
 BOTTOM_ANGLE_B = 55   # Bottom position for Servo B
-TOP_ANGLE_B = 85       # Top position for Servo B
+TOP_ANGLE_B = 70       # Top position for Servo B
 
 # PWM Frequency
 PWM_FREQUENCY = 50  # 50Hz is standard for servos

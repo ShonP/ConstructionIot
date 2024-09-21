@@ -78,27 +78,28 @@ def robot_control():
 
     while True:
         tracking_test()
-        current_time = time.time()
-        # Replace the existing pause logic with look_around
-        if current_time - last_action_time >= 2:
-            logging.info("Stopping robot for look around sequence.")
-            try:
-                brake()
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(look_around())
-                loop.close()
-                logging.info("Look around sequence completed.")
-            except Exception as e:
-                logging.error(f"Error during look around: {e}")
-            finally:
-                last_action_time = time.time()
+       
 
         if is_on_track:
             if not recording_event.is_set():
                 logging.info("Starting recording...")
                 time.sleep(0.5)
                 recording_event.set()
+            current_time = time.time()
+            # Replace the existing pause logic with look_around
+            if current_time - last_action_time >= 2:
+                logging.info("Stopping robot for look around sequence.")
+                try:
+                    brake()
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    loop.run_until_complete(look_around())
+                    loop.close()
+                    logging.info("Look around sequence completed.")
+                except Exception as e:
+                    logging.error(f"Error during look around: {e}")
+                finally:
+                    last_action_time = time.time()
         else:
             if recording_event.is_set():
                 logging.info("Stopping recording...")
