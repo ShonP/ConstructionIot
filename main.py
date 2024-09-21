@@ -81,9 +81,9 @@ def robot_control():
         current_time = time.time()
         # Replace the existing pause logic with look_around
         if current_time - last_action_time >= 2:
-            logging.info("Initiating look around sequence.")
+            logging.info("Stopping robot for look around sequence.")
             try:
-                # Create a new event loop for this thread
+                brake()
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 loop.run_until_complete(look_around())
